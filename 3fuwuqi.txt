@@ -1,0 +1,116 @@
+# 删除现有虚拟环境
+rm -rf .venv
+
+# 创建新的虚拟环境
+python -m venv .venv
+
+# 激活虚拟环境
+# Windows:
+.venv\Scripts\Activate.ps1
+# Linux/Mac:
+# source .venv/bin/activate
+
+# 安装依赖
+pip install fastapi uvicorn sqlalchemy
+
+127.0.0.1 也可以写作：
+
+http://localhost:8000
+
+
+因为 localhost 在 DNS 中会自动映射到 127.0.0.1。
+
+⚙️ 二、:8000 是什么？
+
+8000 是端口号（Port）。
+
+当你运行命令：
+
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+
+意思就是：
+
+启动一个 HTTP 服务器，在当前电脑上监听 8000 端口
+
+端口就像门牌号：
+
+一台电脑上可以有很多服务，比如：
+
+80 → 网站 HTTP 服务
+
+443 → HTTPS
+
+22 → SSH
+
+3306 → MySQL
+
+8000 / 8080 / 5000 → 常用开发端口
+
+浏览器访问时：
+
+http://127.0.0.1:8000
+
+
+其实就是请求：
+
+“访问这台电脑的 8000 端口上的 HTTP 服务”
+首先运行数据库修复脚本：
+bash
+python fix_database.py
+然后重新启动你的应用程序：
+bash
+python main.py
+这些更改解决了以下问题：
+
+为Admin模型中的updated_at列添加了nullable=True属性，以确保在现有数据库中添加该列时不会出现问题
+创建了一个修复脚本，可以自动为现有数据库添加缺失的列
+为API端点添加了适当的错误处理，当出现数据库结构不匹配时提供更友好的错误信息
+保持了所有现有功能不变
+uvx git-mcp GIT_REPOS_PATH=/path/to/your/git/repositories
+检查系统中是否安装了 uv 工具
+
+终端已运行
+uv --version
+终端输出 
+查看终端
+尝试直接运行 uvx 命令检查是否可用
+
+终端已运行
+uvx --version
+终端输出 
+查看终端
+检查 PATH 环境变量中是否包含 uvx
+
+终端已运行
+where uvx
+终端输出 
+查看终端
+检查 uv 在 PATH 中的位置
+
+终端已运行
+where uv
+终端输出 
+查看终端
+通过 uv 工具安装 git-mcp
+
+终端已运行
+uv tool install git-mcp
+终端输出 
+查看终端
+将 uvx 添加到 PATH 环境变量中
+
+终端已运行
+$env:PATH += ";C:\Users\Administrator\.local\bin"
+终端输出 
+查看终端
+验证 git-mcp 是否可以正常运行
+
+终端运行中
+git-mcp --help
+终端输出 
+查看终端
+打开VSCode的内置终端。
+
+激活您项目对应的Python环境（如果有的话）。
+pip install mysql-connector-python

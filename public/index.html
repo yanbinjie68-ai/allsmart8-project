@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的音乐网站</title>
+    <style>
+        /* 简单的样式 */
+        body { font-family: sans-serif; }
+        #searchInput { padding: 10px; width: 300px; }
+        #searchBtn { padding: 10px 20px; }
+        .song-item { padding: 10px; border-bottom: 1px solid #ccc; }
+        audio { width: 100%; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>我的音乐网站</h1>
+    <div>
+        <input type="text" id="searchInput" placeholder="输入歌手或歌名...">
+        <button id="searchBtn">搜索</button>
+    </div>
+    <div id="resultContainer"></div>
+
+    <script>
+        const searchBtn = document.getElementById('searchBtn');
+        const searchInput = document.getElementById('searchInput');
+        const resultContainer = document.getElementById('resultContainer');
+
+        // 您的后端API地址，如果在线，就换成您的服务器IP/域名
+        const API_BASE_URL = 'http://localhost:3000';
+
+        // 绑定搜索按钮点击事件
+        searchBtn.addEventListener('click', handleSearch);
+
+        async function handleSearch() {
+            const keywords = searchInput.value.trim();
+            if (!keywords) return;
+
+            try {
+                // 调用后端的搜索接口
+                const response = await fetch(`${API_BASE_URL}/search?keywords=${encodeURIComponent(keywords)}`);
+                const data = await response.json();
+
+                // 清空之前的结果
+                resultContainer.innerHTML = '';
+
+                if (data.result && data.result.songs) {
+                    // 遍历歌曲列表并展示
+                    data.result.songs.forEach(song => {
+                        displaySong(song);
+                    });
+                } else {
+                    resultContainer.innerHTML = '<p>未找到相关歌曲</p>';
+                }
+            } catch (error) {
+                console.error('搜索失败:', error);
+                resultContainer.innerHTML = '<p>搜索失败，请检查网络或后端服务</p>';
+            }
+        }
+
+        async function displaySong(song) {
+            const songDiv = document.createElement('div');
+            songDiv.className = 'song-item';
+            songDiv.innerHTML = `
+                <strong>${song.name}</strong> - ${song.artists.map(art => art.name).join('/')}
+                <br>
+                <button onclick="playSong(${song.id})">播放</button>
+            `;
+            resultContainer.appendChild(songDiv);
+        }
+
+        // 播放歌曲的函数
+        async function playSong(songId) {
+            try {
+                // 1. 获取歌曲的播放链接
+                const urlResponse = await fetch(`${API_BASE_URL}/song/url?id=${songId}`);
+                const urlData = await urlResponse.json();
+                const songUrl = urlData.data[0].url;
+
+                if (!songUrl) {
+                    alert('无法获取播放链接，可能是版权或地区限制');
+                    return;
+                }
+
+                // 2. 创建音频元素并播放
+                // 先停止之前可能正在播放的音频
+                stopCurrentAudio();
+
+                // 创建新的音频元素
+                const audioElement = document.createElement('audio');
+                audioElement.controls = true; // 显示播放控件
+                audioElement.src = songUrl;
+                audioElement.autoplay = true;
+
+                // 将播放器添加到页面
+                document.body.appendChild(audioElement);
+                
+                // 保存当前音频元素的引用，以便下次停止
+                window.currentAudio = audioElement;
+
+            } catch (error) {
+                console.error('播放失败:', error);
+                alert('播放失败');
+            }
+        }
+
+        function stopCurrentAudio() {
+            if (window.currentAudio) {
+                window.currentAudio.pause();
+                window.currentAudio.remove();
+                window.currentAudio = null;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllSmart - 智能生活助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --success: #4ade80;
+            --warning: #facc15;
+            --danger: #f87171;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --card-bg: #ffffff;
+            --sidebar-bg: #f1f5f9;
+            --info: #4cc9f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
+            padding: 80px 0 20px;
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            height: 100vh;
+            position: fixed;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            border-radius: 0 30px 30px 0;
+            margin-right: 10px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-links a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 80px 20px 20px 270px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        /* 登录注册表单样式 */
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-group .input-icon {
+            position: absolute;
+            left: 10px;
+            color: #94a3b8;
+            z-index: 1;
+        }
+        
+        .input-group .input-icon.right {
+            left: auto;
+            right: 10px;
+            cursor: pointer;
+        }
+        
+        .input-group input, .form-control {
+            padding: 10px 15px 10px 35px;
+            width: 100%;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .btn-block {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .link {
+            color: #4361ee;
+            text-decoration: none;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-label input {
+            margin-right: 8px;
+            margin-top: 4px;
+        }
+
+        .checkmark {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 3px;
+            position: relative;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .checkbox-label input:checked + .checkmark::after {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 1px;
+            width: 4px;
+            height: 8px;
+            border: solid #4361ee;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1001;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: #4caf50;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        .notification.warning {
+            background-color: #ff9800;
+        }
+        
+        /* 媒体播放器 */
+        .media-player {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .media-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .progress-container {
+            width: 100%;
+            background: #e2e8f0;
+            border-radius: 5px;
+            height: 6px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .media-info {
+            text-align: center;
+        }
+
+        .media-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .media-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .volume-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .volume-controls input[type="range"] {
+            width: 100px;
+            height: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e2e8f0;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .volume-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+            outline: none;
+        }
+
+        .search-box button {
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+        }
+
+        .playlist-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .playlist-controls select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-primary {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+        }
+
+        .track-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .track-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        .track-item:hover {
+            background: #f1f5f9;
+        }
+
+        .track-item.active {
+            background: #dbeafe;
+        }
+
+        .track-number {
+            width: 30px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .track-info {
+            flex: 1;
+        }
+
+        .track-title {
+            font-weight: 500;
+        }
+
+        .track-artist {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .track-duration {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+    
+        /* AI 助手 */
+        .ai-assistant {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 5px;
+            padding: 10px 15px;
+            max-width: 80%;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: #e2e8f0;
+            color: var(--dark);
+            border-bottom-left-radius: 5px;
+            padding: 10px 15px;
+            max-width: 80%;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .ai-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ai-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+            outline: none;
+        }
+
+        .ai-input button {
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ai-input button:hover {
+            background: var(--secondary);
+        }
+
+        /* 聊天界面 */
+        .chat-container {
+            display: flex;
+            height: 400px;
+        }
+
+        .contacts {
+            width: 30%;
+            border-right: 1px solid #e2e8f0;
+            padding-right: 15px;
+        }
+
+        .contact {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .contact:hover, .contact.active {
+            background: #e2e8f0;
+        }
+
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-left: 15px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+        }
+
+        .sent {
+            align-self: flex-end;
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .received {
+            align-self: flex-start;
+            background: #e2e8f0;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .message-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+            outline: none;
+        }
+
+        .message-input button {
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+        }
+
+        /* 统计信息 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .icon-blue {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .icon-green {
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--success);
+        }
+
+        .icon-yellow {
+            background: rgba(250, 204, 21, 0.1);
+            color: var(--warning);
+        }
+
+        .icon-red {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--danger);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* 任务管理 */
+        .tasks-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .task-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #f8fafc;
+        }
+
+        .task-item input {
+            margin-right: 10px;
+        }
+
+        .task-form input, .task-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .task-form button {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* 隐藏元素 */
+        .hidden {
+            display: none;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 10px;
+                height: auto;
+                position: relative;
+            }
+
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .nav-links li {
+                margin-bottom: 0;
+                margin-right: 5px;
+            }
+
+            .nav-links a {
+                border-radius: 30px;
+                margin-right: 0;
+                white-space: nowrap;
+            }
+
+            .tasks-container {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .contacts {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                padding-right: 0;
+                padding-bottom: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .main-content {
+                padding: 100px 10px 20px;
+            }
+        }
+        
+        /* 修复页面显示不完整问题 */
+        html, body {
+            height: 100%;
+        }
+        
+        /* 设备控制面板样式 */
+        .device-control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .device-control-card {
+            text-align: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+        
+        .device-control-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .device-control-card h4 {
+            margin: 10px 0;
+        }
+        
+        .device-control-card p {
+            color: #64748b;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        
+        .device-control-card button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .device-control-card .btn-toggle-on {
+            background: var(--success);
+            color: white;
+        }
+        
+        .device-control-card .btn-toggle-off {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .device-control-card .btn-config {
+            background: var(--primary);
+            color: white;
+            margin-top: 5px;
+        }
+        
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+        
+        table th {
+            background-color: #f1f5f9;
+        }
+        
+        table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        .status-online {
+            color: #22c55e;
+        }
+        
+        .status-offline {
+            color: #ef4444;
+        }
+        /* 示例：统一按钮样式 */
+        .btn-primary, .btn-secondary {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <div class="logo">
+            <h1>智能生活助手</h1>
+        </div>
+        
+        <!-- 登录/注册按钮区域 -->
+        <div class="auth-buttons">
+            <div id="auth-section">
+                <!-- 未登录时显示 -->
+                <button id="login-btn" class="btn btn-primary">登录</button>
+                <button id="register-btn" class="btn btn-secondary">注册</button>
+                
+                <!-- 登录后显示 -->
+                <div id="user-section" class="user-info hidden">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <span id="username-display">用户名</span>
+                    <button id="logout-btn" class="btn btn-secondary">登出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1><i class="fas fa-brain"></i> AllSmart</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active" data-tab="dashboard"><i class="fas fa-home"></i> 仪表盘</a></li>
+                <li><a href="#" data-tab="media"><i class="fas fa-play-circle"></i> 媒体中心</a></li>
+                <li><a href="#" data-tab="ai"><i class="fas fa-robot"></i> AI助手</a></li>
+                <li><a href="#" data-tab="chat"><i class="fas fa-comments"></i> 聊天</a></li>
+                <li><a href="#" data-tab="stats"><i class="fas fa-chart-bar"></i> 使用统计</a></li>
+                <li><a href="#" data-tab="tasks"><i class="fas fa-tasks"></i> 任务管理</a></li>
+                <li><a href="#" data-tab="devices"><i class="fas fa-microchip"></i> 设备控制</a></li>
+            </ul>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 仪表盘 -->
+            <div id="dashboard" class="tab-content card active">
+                <div class="card-header">
+                    <h3>仪表盘</h3>
+                </div>
+                <div id="welcome-content">
+                    <p>欢迎使用智能生活助手！</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon icon-blue">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </div>
+                        <div class="stat-value">12.5 GB</div>
+                        <div class="stat-label">本月流量</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-green">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                        <div class="stat-value">45.2 GB</div>
+                        <div class="stat-label">已用存储</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-yellow">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-value">142 天</div>
+                        <div class="stat-label">服务时长</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon icon-red">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-value">8 个</div>
+                        <div class="stat-label">进行中任务</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>最近活动</h3>
+                    </div>
+                    <div class="recent-activity">
+                        <p>今天 09:30 - 启动了客厅音响播放音乐</p>
+                        <p>今天 08:15 - 设置了明天上午8点的闹钟</p>
+                        <p>昨天 20:45 - 与AI助手讨论了天气预报</p>
+                        <p>昨天 15:20 - 发送了一条消息给家人</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 登录表单 -->
+            <div id="login-card" class="card">
+                <div class="card-header">
+                    <h3>用户登录</h3>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">用户名或邮箱</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-user"></i></span>
+                            <input type="text" id="login-username" placeholder="请输入用户名或邮箱" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="login-password" placeholder="请输入密码" required>
+                            <span class="input-icon right"><i class="fas fa-eye" id="toggle-password"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group form-row">
+                        <div class="col">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="remember-me">
+                                <span class="checkmark">记住我</span>
+                            </label>
+                        </div>
+                        <div class="col text-right">
+                            <a href="#" class="link">忘记密码？</a>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn">
+                        <span id="login-submit-text">登录</span>
+                    </button>
+                </form>
+                <div class="form-footer">
+                    <p>还没有账户？<a href="#" id="show-register-link" class="link">立即注册</a></p>
+                </div>
+            </div>
+
+            <!-- 注册表单 -->
+            <div id="register-card" class="card">
+                <div class="card-header">
+                    <h3>用户注册</h3>
+                </div>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-username">用户名</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-user"></i></span>
+                            <input type="text" id="register-username" placeholder="请输入用户名" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">邮箱</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                            <!-- 示例：添加客户端验证 -->
+                            <input type="email" id="register-email" placeholder="请输入邮箱" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}">                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="register-password" placeholder="请输入密码" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">确认密码</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="register-confirm-password" placeholder="请再次输入密码" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agree-terms" required>
+                            <span class="checkmark">我已阅读并同意 <a href="#" class="link">用户协议</a> 和 <a href="#" class="link">隐私政策</a></span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="register-submit-btn">
+                        <span id="register-submit-text">注册</span>
+                    </button>
+                </form>
+                <div class="form-footer">
+                    <p>已有账户？<a href="#" id="show-login-link" class="link">立即登录</a></p>
+                </div>
+            </div>
+
+            <!-- 媒体中心 -->
+            <div id="media" class="tab-content card">
+                <div class="card-header">
+                    <h3>音乐播放器</h3>
+                </div>
+                <div class="media-player">
+                    <div class="media-info">
+                        <h4 id="current-track">未选择歌曲</h4>
+                        <p id="current-artist">请选择一首歌曲开始播放</p>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <div class="media-controls">
+                        <button class="control-btn" id="prev-btn"><i class="fas fa-step-backward"></i></button>
+                        <button class="control-btn" id="play-pause-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn" id="next-btn"><i class="fas fa-step-forward"></i></button>
+                    </div>
+                    <div class="volume-controls">
+                        <i class="fas fa-volume-down"></i>
+                        <input type="range" id="volume-slider" min="0" max="100" value="80">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>音乐库</h3>
+                        <div class="search-box">
+                            <input type="text" id="music-search" placeholder="搜索音乐...">
+                            <button id="search-btn"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                    <div class="music-library">
+                        <div class="playlist-controls">
+                            <button id="play-all-btn" class="btn-primary">播放全部</button>
+                            <select id="genre-filter">
+                                <option value="">所有类型</option>
+                                <option value="pop">流行</option>
+                                <option value="rock">摇滚</option>
+                                <option value="jazz">爵士</option>
+                                <option value="classical">古典</option>
+                                <option value="electronic">电子</option>
+                            </select>
+                        </div>
+                        <div class="track-list" id="track-list">
+                            <!-- 音乐列表将通过JavaScript动态加载 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>视频播放</h3>
+                    </div>
+                    <div class="media-player">
+                        <div class="media-info">
+                            <h4>科技新闻快报</h4>
+                            <p>科技资讯 · 15:30</p>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: 65%;"></div>
+                        </div>
+                        <div class="media-controls">
+                            <button class="control-btn"><i class="fas fa-step-backward"></i></button>
+                            <button class="control-btn"><i class="fas fa-pause"></i></button>
+                            <button class="control-btn"><i class="fas fa-step-forward"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI助手 -->
+            <div id="ai" class="tab-content card">
+                <div class="card-header">
+                    <h3>AI智能助手</h3>
+                </div>
+                <div class="ai-assistant">
+                    <div class="chat-history" id="ai-chat-history">
+                        <div class="message ai-message">
+                            您好！我是您的AI助手，有什么可以帮助您的吗？
+                        </div>
+                        <div class="message user-message">
+                            今天的天气怎么样？
+                        </div>
+                        <div class="message ai-message">
+                            根据最新气象数据，今天多云转晴，气温在22-28°C之间，空气质量良好，适合户外活动。
+                        </div>
+                        <div class="message user-message">
+                            推荐一些适合这个季节听的音乐吧
+                        </div>
+                        <div class="message ai-message">
+                            根据当前季节和天气，我为您推荐以下歌曲：
+                            1. 《夏日漱石》- 清新轻快的旋律
+                            2. 《阳光彩虹小白马》- 充满活力
+                            3. 《海阔天空》- 经典励志
+                            您想现在播放这些歌曲吗？
+                        </div>
+                    </div>
+                    <div class="ai-input">
+                        <input type="text" id="ai-input" placeholder="向AI助手提问...">
+                        <button id="ai-send-btn"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>角色识别</h3>
+                    </div>
+                    <div class="character-recognition">
+                        <p>系统检测到您经常在早晨查询天气和新闻，晚上收听音乐。已为您匹配以下角色：</p>
+                        <div style="display: flex; gap: 20px; margin-top: 15px;">
+                            <div style="text-align: center;">
+                                <div style="width: 80px; height: 80px; background: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                                    <i class="fas fa-sun" style="font-size: 2rem; color: #3b82f6;"></i>
+                                </div>
+                                <h4>晨型人</h4>
+                                <p style="font-size: 0.9rem; color: #64748b;">早起查询信息</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="width: 80px; height: 80px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                                    <i class="fas fa-music" style="font-size: 2rem; color: #22c55e;"></i>
+                                </div>
+                                <h4>音乐爱好者</h4>
+                                <p style="font-size: 0.9rem; color: #64748b;">喜欢放松音乐</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="width: 80px; height: 80px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                                    <i class="fas fa-newspaper" style="font-size: 2rem; color: #f59e0b;"></i>
+                                </div>
+                                <h4>资讯达人</h4>
+                                <p style="font-size: 0.9rem; color: #64748b;">关注时事动态</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 聊天 -->
+            <div id="chat" class="tab-content card">
+                <div class="card-header">
+                    <h3>即时通讯</h3>
+                </div>
+                <div class="chat-container">
+                    <div class="contacts">
+                        <div class="contact active">
+                            <div class="contact-avatar">家</div>
+                            <div>家庭群聊</div>
+                        </div>
+                        <div class="contact">
+                            <div class="contact-avatar">朋</div>
+                            <div>朋友</div>
+                        </div>
+                        <div class="contact">
+                            <div class="contact-avatar">同</div>
+                            <div>同事</div>
+                        </div>
+                        <div class="contact">
+                            <div class="contact-avatar">李</div>
+                            <div>李明</div>
+                        </div>
+                    </div>
+                    <div class="chat-area">
+                        <div class="messages">
+                            <div class="message-bubble received">
+                                大家早上好！今天天气不错呢
+                            </div>
+                            <div class="message-bubble sent">
+                                是啊，适合出去走走
+                            </div>
+                            <div class="message-bubble received">
+                                中午一起吃饭吗？
+                            </div>
+                            <div class="message-bubble sent">
+                                好啊，老地方见
+                            </div>
+                            <div class="message-bubble received">
+                                记得带伞，下午可能有雨
+                            </div>
+                        </div>
+                        <div class="message-input">
+                            <input type="text" id="message-input" placeholder="输入消息...">
+                            <button id="send-message-btn"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 使用统计 -->
+            <div id="stats" class="tab-content card">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>网络流量使用情况</h3>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="networkChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>云存储使用情况</h3>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="storageChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">365 天</div>
+                        <div class="stat-label">服务使用时长</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2 年</div>
+                        <div class="stat-label">服务年限</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务管理 -->
+            <div id="tasks" class="tab-content card">
+                <div class="tasks-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>我的任务</h3>
+                        </div>
+                        <div class="task-list" id="task-list">
+                            <div class="task-item">
+                                <input type="checkbox">
+                                <div>
+                                    <div>早上8点闹钟</div>
+                                    <div style="font-size: 0.8rem; color: #64748b;">每天</div>
+                                </div>
+                            </div>
+                            <div class="task-item">
+                                <input type="checkbox">
+                                <div>
+                                    <div>下午3点会议</div>
+                                    <div style="font-size: 0.8rem; color: #64748b;">今天</div>
+                                </div>
+                            </div>
+                            <div class="task-item">
+                                <input type="checkbox" checked>
+                                <div>
+                                    <div>购买生日礼物</div>
+                                    <div style="font-size: 0.8rem; color: #64748b;">明天</div>
+                                </div>
+                            </div>
+                            <div class="task-item">
+                                <input type="checkbox">
+                                <div>
+                                    <div>健身一小时</div>
+                                    <div style="font-size: 0.8rem; color: #64748b;">每周三次</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>添加新任务</h3>
+                        </div>
+                        <div class="task-form" id="task-form">
+                            <input type="text" id="task-title" placeholder="任务标题">
+                            <textarea id="task-description" placeholder="任务描述"></textarea>
+                            <input type="date" id="task-due-date" placeholder="截止日期">
+                            <button id="add-task-btn">添加任务</button>
+                        </div>
+                        
+                        <div class="card-header" style="margin-top: 20px;">
+                            <h3>推荐功能</h3>
+                        </div>
+                        <div>
+                            <p><i class="fas fa-lightbulb" style="color: #f59e0b;"></i> 基于您的使用习惯，我们推荐以下功能：</p>
+                            <ul style="padding-left: 20px; margin-top: 10px;">
+                                <li>智能提醒：根据您的日程自动设置提醒</li>
+                                <li>健康监测：连接健康设备追踪身体状况</li>
+                                <li>智能家居：一键控制家中所有智能设备</li>
+                                <li>学习助手：根据兴趣推荐学习内容</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 设备控制 -->
+            <div id="devices" class="tab-content card">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>我的设备</h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">在线设备</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">离线设备</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>设备控制面板</h3>
+                    </div>
+                    <div class="device-control-grid">
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
+                            </div>
+                            <h4>客厅灯</h4>
+                            <p id="living-room-light-status" style="color: #64748b; margin: 10px 0;">已开启</p>
+                            <button class="btn-toggle-on" data-device="living-room-light">关闭</button>
+                        </div>
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-volume-up" style="color: #3b82f6;"></i>
+                            </div>
+                            <h4>音响</h4>
+                            <p id="speaker-status" style="color: #64748b; margin: 10px 0;">正在播放</p>
+                            <button class="btn-toggle-on" data-device="speaker">暂停</button>
+                        </div>
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-thermometer-half" style="color: #ef4444;"></i>
+                            </div>
+                            <h4>空调</h4>
+                            <p id="ac-status" style="color: #64748b; margin: 10px 0;">25°C</p>
+                            <button class="btn-config" data-device="ac">调节</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 新增设备信息表格 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>网络连接设备</h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>设备ID</th>
+                                    <th>设备名称</th>
+                                    <th>IP地址</th>
+                                    <th>MAC地址</th>
+                                    <th>状态</th>
+                                    <th>连接时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>DEV001</td>
+                                    <td>客厅智能灯</td>
+                                    <td>192.168.1.105</td>
+                                    <td>A1:B2:C3:D4:E5:F6</td>
+                                    <td><span class="status-online">在线</span></td>
+                                    <td>2023-06-15 08:32</td>
+                                </tr>
+                                <tr>
+                                    <td>DEV002</td>
+                                    <td>卧室空调</td>
+                                    <td>192.168.1.112</td>
+                                    <td>B2:C3:D4:E5:F6:A1</td>
+                                    <td><span class="status-online">在线</span></td>
+                                    <td>2023-06-15 08:45</td>
+                                </tr>
+                                <tr>
+                                    <td>DEV003</td>
+                                    <td>厨房音响</td>
+                                    <td>192.168.1.120</td>
+                                    <td>C3:D4:E5:F6:A1:B2</td>
+                                    <td><span class="status-offline">离线</span></td>
+                                    <td>2023-06-14 17:22</td>
+                                </tr>
+                                <tr>
+                                    <td>DEV004</td>
+                                    <td>门锁系统</td>
+                                    <td>192.168.1.108</td>
+                                    <td>D4:E5:F6:A1:B2:C3</td>
+                                    <td><span class="status-online">在线</span></td>
+                                    <td>2023-06-15 07:15</td>
+                                </tr>
+                                <tr>
+                                    <td>DEV005</td>
+                                    <td>智能电视</td>
+                                    <td>192.168.1.130</td>
+                                    <td>E5:F6:A1:B2:C3:D4</td>
+                                    <td><span class="status-online">在线</span></td>
+                                    <td>2023-06-15 18:30</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>网络状态</h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon icon-blue">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div class="stat-value">192.168.1.1</div>
+                            <div class="stat-label">路由器IP</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-green">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="stat-value">85 Mbps</div>
+                            <div class="stat-label">下载速度</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-yellow">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="stat-value">42 Mbps</div>
+                            <div class="stat-label">上传速度</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-red">
+                                <i class="fas fa-signal"></i>
+                            </div>
+                            <div class="stat-value">-65 dBm</div>
+                            <div class="stat-label">WiFi信号</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>网络连接控制</h3>
+                    </div>
+                    <div class="device-control-grid">
+                        <!-- 蓝牙开关 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-bluetooth" style="color: #3b82f6;"></i>
+                            </div>
+                            <h4>蓝牙</h4>
+                            <p id="bluetooth-status" style="color: #64748b; margin: 10px 0;">已关闭</p>
+                            <button class="btn-toggle-off" id="bluetooth-toggle" data-device="bluetooth">开启</button>
+                        </div>
+                        
+                        <!-- WiFi热点开关 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-wifi" style="color: #22c55e;"></i>
+                            </div>
+                            <h4>WiFi热点</h4>
+                            <p id="wifi-status" style="color: #64748b; margin: 10px 0;">已开启</p>
+                            <button class="btn-toggle-on" id="wifi-toggle" data-device="wifi">关闭</button>
+                        </div>
+                        
+                        <!-- 数据流量开关 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-signal" style="color: #f59e0b;"></i>
+                            </div>
+                            <h4>数据流量</h4>
+                            <p id="data-status" style="color: #64748b; margin: 10px 0;">已开启</p>
+                            <button class="btn-toggle-on" id="data-toggle" data-device="data">关闭</button>
+                        </div>
+                        
+                        <!-- VPN开关 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-shield-alt" style="color: #8b5cf6;"></i>
+                            </div>
+                            <h4>VPN</h4>
+                            <p id="vpn-status" style="color: #64748b; margin: 10px 0;">已关闭</p>
+                            <button class="btn-toggle-off" id="vpn-toggle" data-device="vpn">开启</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>设备功能设置</h3>
+                    </div>
+                    <div class="device-control-grid">
+                        <!-- 本地传输开关 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-exchange-alt" style="color: #ec4899;"></i>
+                            </div>
+                            <h4>本地传输</h4>
+                            <p id="transfer-status" style="color: #64748b; margin: 10px 0;">已关闭</p>
+                            <button class="btn-toggle-off" id="transfer-toggle" data-device="transfer">开启</button>
+                        </div> 
+                        <!-- 声音设置 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-volume-up" style="color: #3b82f6;"></i>
+                            </div>
+                            <h4>声音设置</h4>
+                            <p id="sound-status" style="color: #64748b; margin: 10px 0;">音量: 60%</p>
+                            <button class="btn-config" id="sound-config" data-device="sound">调节</button>
+                        </div> 
+               
+                        <!-- 音效配置 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-sliders-h" style="color: #f59e0b;"></i>
+                            </div>
+                            <h4>音效配置</h4>
+                            <p id="audio-status" style="color: #64748b; margin: 10px 0;">标准模式</p>
+                            <button class="btn-config" id="audio-config" data-device="audio">配置</button>
+                        </div>
+                
+                        <!-- 视频配置 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-video" style="color: #ef4444;"></i>
+                            </div>
+                            <h4>视频配置</h4>
+                            <p id="video-status" style="color: #64748b; margin: 10px 0;">高清 1080p</p>
+                            <button class="btn-config" id="video-config" data-device="video">设置</button>
+                        </div>
+                    </div>
+                </div> 
+                <div class="card">
+                    <div class="card-header">
+                        <h3>设备功能</h3>
+                    </div>
+                    <div class="device-control-grid">
+                        <!-- API权限管理 -->
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-key" style="color: #8b5cf6;"></i>
+                            </div>
+                            <h4>API权限</h4>
+                            <p style="color: #64748b; margin: 10px 0;">管理API访问权限</p>
+                            <button class="btn-config" id="api-permission-btn">管理权限</button>
+                        </div>
+                        
+                        <div class="device-control-card">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">
+                                <i class="fas fa-camera" style="color: #ec4899;"></i>
+                            </div>
+                            <h4>摄像头</h4>
+                            <p id="camera-status" style="color: #64748b; margin: 10px 0;">已关闭</p>
+                            <button class="btn-toggle-off" id="camera-toggle" data-device="camera">开启</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 工具函数
+        const utils = {
+            showNotification: function(message, type) {
+                // 移除现有的通知
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                
+                // 创建通知元素
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                // 添加到页面
+                document.body.appendChild(notification);
+                
+                // 显示通知
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            }
+        };
+
+        // 认证管理模块
+        const authManager = {
+            // 初始化认证管理模块
+            init: function() {
+                // 绑定顶部导航按钮事件
+                document.getElementById('login-btn').addEventListener('click', () => {
+                    this.showLoginForm();
+                });
+                
+                document.getElementById('register-btn').addEventListener('click', () => {
+                    this.showRegisterForm();
+                });
+                
+                // 绑定表单内的链接事件
+                document.getElementById('show-register-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.showRegisterForm();
+                });
+                
+                document.getElementById('show-login-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.showLoginForm();
+                });
+                
+                // 绑定登录表单提交事件
+                const loginForm = document.getElementById('login-form');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleLogin();
+                    });
+                }
+                
+                // 绑定注册表单提交事件
+                const registerForm = document.getElementById('register-form');
+                if (registerForm) {
+                    registerForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleRegister();
+                    });
+                }
+                
+                // 绑定登出按钮事件
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    this.logout();
+                });
+                
+                // 绑定密码显示切换
+                document.getElementById('toggle-password').addEventListener('click', () => {
+                    this.togglePasswordVisibility();
+                });
+                
+                // 页面加载时检查用户登录状态
+                this.checkLoginStatus();
+            },
+            
+            // 显示登录表单
+            showLoginForm: function() {
+                // 隐藏所有卡片
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                // 显示登录卡片
+                document.getElementById('login-card').classList.add('active');
+            },
+            
+            // 显示注册表单
+            showRegisterForm: function() {
+                // 隐藏所有卡片
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                // 显示注册卡片
+                document.getElementById('register-card').classList.add('active');
+            },
+            
+            // 示例：注册前校验
+            validateRegisterForm: function() {
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+
+                if (!email.includes('@')) {
+                    alert('请输入有效的邮箱地址');
+                    return false;
+                }
+                if (password.length < 8) {
+                    alert('密码至少需要8位');
+                    return false;
+                }
+                return true;
+            },
+            
+            // 切换到仪表盘
+            switchToDashboard: function() {
+                // 隐藏所有卡片
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                // 显示仪表盘
+                document.getElementById('dashboard').classList.add('active');
+            },
+            
+            // 处理用户登录
+            handleLogin: async function() {
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+                const rememberMe = document.getElementById('remember-me').checked;
+                
+                // 基本验证
+                if (!username || !password) {
+                    utils.showNotification('请填写用户名和密码', 'warning');
+                    return;
+                }
+                
+                try {
+                    // 发送登录请求
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            'username': username,
+                            'password': password
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.access_token) {
+                        // 保存token
+                        if (rememberMe) {
+                            localStorage.setItem('token', result.access_token);
+                            localStorage.setItem('username', username);
+                        } else {
+                            sessionStorage.setItem('token', result.access_token);
+                            sessionStorage.setItem('username', username);
+                        }
+                        
+                        utils.showNotification('登录成功', 'success');
+                        
+                        // 更新UI
+                        this.updateUIAfterLogin(username);
+                        
+                        // 清空登录表单
+                        document.getElementById('login-form').reset();
+                        
+                        // 切换到仪表盘
+                        this.switchToDashboard();
+                    } else {
+                        throw new Error(result.detail || '登录失败');
+                    }
+                } catch (error) {
+                    utils.showNotification('登录失败: ' + error.message, 'error');
+                }
+            },
+            
+            // 处理用户注册
+        // 修改handleRegister函数
+        handleRegister: async function() {
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const agreeTerms = document.getElementById('agree-terms').checked;
+
+            // 基本验证
+            if (!username || !email || !password || !confirmPassword) {
+                utils.showNotification('请填写所有必填字段', 'warning');
+                return;
+            }
+
+            if (!agreeTerms) {
+                utils.showNotification('请同意用户协议和隐私政策', 'warning');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                utils.showNotification('两次输入的密码不一致', 'error');
+                return;
+            }
+
+            // 验证邮箱格式
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                utils.showNotification('请输入有效的邮箱地址', 'error');
+                return;
+            }
+
+            // 验证密码强度
+            if (password.length < 8) {
+                utils.showNotification('密码至少需要8位', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    utils.showNotification('注册成功！', 'success');
+                    this.showLoginForm();
+                } else {
+                    const errorData = await response.json();
+                    utils.showNotification(`注册失败: ${errorData.detail || '未知错误'}`, 'error');
+                }
+            } catch (error) {
+                utils.showNotification('网络错误，请检查连接后重试: ' + error.message, 'error');
+            }
+        },
+            // 登出用户
+            logout: function() {
+                // 清除token
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('username');
+                
+                // 更新UI
+                this.updateUIAfterLogout();
+                
+                // 显示登录按钮
+                document.getElementById('auth-section').querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('hidden');
+                });
+                document.getElementById('user-section').classList.add('hidden');
+                
+                // 切换到仪表盘
+                this.switchToDashboard();
+                
+                utils.showNotification('已成功登出', 'success');
+            },
+            
+            // 获取认证token
+            getToken: function() {
+                return sessionStorage.getItem('token') || localStorage.getItem('token');
+            },
+            
+            // 检查用户是否已认证
+            isAuthenticated: function() {
+                return !!this.getToken();
+            },
+            
+            // 检查用户登录状态
+            checkLoginStatus: function() {
+                const token = this.getToken();
+                const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+                
+                if (token && username) {
+                    this.updateUIAfterLogin(username);
+                }
+            },
+            
+            // 登录后更新UI
+            updateUIAfterLogin: function(username) {
+                // 显示用户信息
+                document.getElementById('username-display').textContent = username;
+                document.getElementById('user-avatar').textContent = username.charAt(0).toUpperCase();
+                
+                // 切换顶部按钮显示
+                document.getElementById('auth-section').querySelectorAll('button').forEach(btn => {
+                    btn.classList.add('hidden');
+                });
+                document.getElementById('user-section').classList.remove('hidden');
+                
+                // 更新欢迎内容
+                const welcomeContent = document.getElementById('welcome-content');
+                if (welcomeContent) {
+                    welcomeContent.innerHTML = `
+                        <p>欢迎回来，<strong>${username}</strong>！</p>
+                        <p>您已成功登录系统。</p>
+                    `;
+                }
+            },
+            
+            // 登出后更新UI
+            updateUIAfterLogout: function() {
+                // 更新欢迎内容
+                const welcomeContent = document.getElementById('welcome-content');
+                if (welcomeContent) {
+                    welcomeContent.innerHTML = '<p>欢迎使用智能生活助手！</p>';
+                }
+            },
+            
+            // 切换密码可见性
+            togglePasswordVisibility: function() {
+                const passwordInput = document.getElementById('login-password');
+                const toggleIcon = document.getElementById('toggle-password');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
+            }
+        };
+
+        // Tab切换功能
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有活动状态
+                document.querySelectorAll('.nav-links a').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // 添加当前活动状态
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+<!-- user.html - 修改注册函数 -->
+
+// 修改注册函数以正确处理JSON响应
+async function registerUser() {
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    // 验证输入
+    if (!username || !email || !password) {
+        utils.showNotification('请填写所有必填字段', 'error');
+        return;
+    }
+    
+    const loadingBtn = document.getElementById('register-btn');
+    const loadText = loadingBtn.textContent;
+    const loadLoader = document.getElementById('register-loader');
+    
+    utils.setButtonLoading(loadingBtn, loadText, loadLoader, true);
+    
+    try {
+        const response = await fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.message === '注册成功') {
+            utils.showNotification('注册成功！请登录', 'success');
+            // 跳转到登录页面或刷新
+            window.location.href = '/login';
+        } else {
+            // 处理错误情况
+            const errorMessage = result.error || '注册失败，请稍后重试';
+            utils.showNotification(errorMessage, 'error');
+        }
+        
+    } catch (error) {
+        console.error('注册请求失败:', error);
+        utils.showNotification('网络错误，请检查连接后重试', 'error');
+    } finally {
+        utils.setButtonLoading(loadingBtn, loadText, loadLoader, false);
+    }
+}
+</script>
+        // 发送消息到AI助手
+        async function sendAiMessage() {
+            const input = document.getElementById('ai-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // 添加用户消息到聊天历史
+            const chatHistory = document.getElementById('ai-chat-history');
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'message user-message';
+            userMessageDiv.textContent = message;
+            chatHistory.appendChild(userMessageDiv);
+            
+            // 清空输入框
+            input.value = '';
+            
+            // 滚动到底部
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            // 显示"AI正在输入"的提示
+            const aiTypingDiv = document.createElement('div');
+            aiTypingDiv.className = 'message ai-message';
+            aiTypingDiv.id = 'ai-typing';
+            aiTypingDiv.textContent = 'AI正在输入...';
+            chatHistory.appendChild(aiTypingDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            try {
+                // 模拟AI响应（实际应用中应该调用后端API）
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 移除"AI正在输入"提示
+                if (document.getElementById('ai-typing')) {
+                    document.getElementById('ai-typing').remove();
+                }
+                
+                // 添加AI回复到聊天历史
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'message ai-message';
+                aiMessageDiv.textContent = "感谢您的提问！这是一个示例响应。在实际应用中，这将由AI模型生成。";
+                chatHistory.appendChild(aiMessageDiv);
+                
+                // 滚动到底部
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            } catch (error) {
+                // 移除"AI正在输入"提示
+                if (document.getElementById('ai-typing')) {
+                    document.getElementById('ai-typing').remove();
+                }
+                
+                // 显示错误消息
+                const errorMessageDiv = document.createElement('div');
+                errorMessageDiv.className = 'message ai-message';
+                errorMessageDiv.textContent = '抱歉，我在处理您的请求时遇到了问题。请稍后再试。';
+                chatHistory.appendChild(errorMessageDiv);
+                
+                // 滚动到底部
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+        }
+        
+        // 设备开关控制功能
+        function setupDeviceControls() {
+            // 为所有设备控制按钮添加事件监听器
+            document.querySelectorAll('[data-device]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const device = this.getAttribute('data-device');
+                    const buttonElement = this;
+                    
+                    // 根据设备类型进行不同处理
+                    switch(device) {
+                        case 'living-room-light':
+                            const lightStatus = document.getElementById('living-room-light-status');
+                            if (buttonElement.classList.contains('btn-toggle-on')) {
+                                lightStatus.textContent = '已关闭';
+                                buttonElement.textContent = '开启';
+                                buttonElement.classList.remove('btn-toggle-on');
+                                buttonElement.classList.add('btn-toggle-off');
+                            } else {
+                                lightStatus.textContent = '已开启';
+                                buttonElement.textContent = '关闭';
+                                buttonElement.classList.remove('btn-toggle-off');
+                                buttonElement.classList.add('btn-toggle-on');
+                            }
+                            break;
+                            
+                        case 'speaker':
+                            const speakerStatus = document.getElementById('speaker-status');
+                            if (buttonElement.textContent === '暂停') {
+                                speakerStatus.textContent = '已暂停';
+                                buttonElement.textContent = '播放';
+                            } else {
+                                speakerStatus.textContent = '正在播放';
+                                buttonElement.textContent = '暂停';
+                            }
+                            break;
+                            
+                        case 'ac':
+                            // 空调调节
+                            alert('打开空调调节面板');
+                            break;
+                            
+                        case 'bluetooth':
+                        case 'wifi':
+                        case 'data':
+                        case 'vpn':
+                        case 'transfer':
+                        case 'camera':
+                            // 切换开关状态
+                            const statusElement = document.getElementById(`${device}-status`);
+                            if (buttonElement.classList.contains('btn-toggle-on')) {
+                                statusElement.textContent = '已关闭';
+                                buttonElement.textContent = '开启';
+                                buttonElement.classList.remove('btn-toggle-on');
+                                buttonElement.classList.add('btn-toggle-off');
+                            } else {
+                                statusElement.textContent = '已开启';
+                                buttonElement.textContent = '关闭';
+                                buttonElement.classList.remove('btn-toggle-off');
+                                buttonElement.classList.add('btn-toggle-on');
+                            }
+                            break;
+                            
+                        case 'sound':
+                            // 音量设置
+                            alert('打开音量设置面板');
+                            break;
+                            
+                        case 'audio':
+                            // 音效配置
+                            alert('打开音效配置面板');
+                            break;
+                            
+                        case 'video':
+                            // 视频配置
+                            alert('打开视频配置面板');
+                            break;
+                    }
+                });
+            });
+        }
+        
+        // API权限管理功能
+        function setupApiPermissionManager() {
+            const apiPermissionManager = {
+                // 管理API权限
+                manageApiPermissions: function() {
+                    // 这里应该打开API权限管理界面
+                    alert('API权限管理功能（占位）\n在这里可以管理用户对不同API的访问权限');
+                }
+            };
+            
+            // 如果有API权限管理按钮，绑定事件
+            const apiPermissionBtn = document.getElementById('api-permission-btn');
+            if (apiPermissionBtn) {
+                apiPermissionBtn.addEventListener('click', function() {
+                    apiPermissionManager.manageApiPermissions();
+                });
+            }
+        }
+        
+        // 初始化图表
+        function initCharts() {
+            // 网络流量图表
+            const networkCtx = document.getElementById('networkChart');
+            if (networkCtx) {
+                new Chart(networkCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        datasets: [{
+                            label: '流量使用 (GB)',
+                            data: [8.2, 9.1, 11.3, 10.2, 12.5, 11.8],
+                            borderColor: '#4361ee',
+                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+
+            // 存储使用图表
+            const storageCtx = document.getElementById('storageChart');
+            if (storageCtx) {
+                new Chart(storageCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['已使用', '剩余'],
+                        datasets: [{
+                            data: [45.2, 54.8],
+                            backgroundColor: ['#4361ee', '#e2e8f0']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 音乐播放器初始化
+        function initMusicPlayer() {
+            // 模拟音乐数据
+            const tracks = [
+                { id: 1, title: "夏日清凉", artist: "清新流行", duration: "3:45", genre: "pop" },
+                { id: 2, title: "科技新闻快报", artist: "科技资讯", duration: "15:30", genre: "news" },
+                { id: 3, title: "夜的钢琴曲", artist: "纯音乐", duration: "4:20", genre: "classical" },
+                { id: 4, title: "电子节拍", artist: "电子音乐", duration: "5:15", genre: "electronic" },
+                { id: 5, title: "爵士咖啡馆", artist: "爵士乐队", duration: "6:30", genre: "jazz" }
+            ];
+            
+            // 初始化播放器状态
+            const playerState = {
+                isPlaying: false,
+                currentTrackIndex: -1,
+                progress: 0,
+                volume: 80,
+                tracks: tracks,
+                filteredTracks: tracks
+            };
+            
+            // 获取DOM元素
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const volumeSlider = document.getElementById('volume-slider');
+            const trackList = document.getElementById('track-list');
+            const musicSearch = document.getElementById('music-search');
+            const searchBtn = document.getElementById('search-btn');
+            const genreFilter = document.getElementById('genre-filter');
+            const playAllBtn = document.getElementById('play-all-btn');
+            
+            // 渲染音乐列表
+            function renderTrackList(tracksToRender) {
+                trackList.innerHTML = '';
+                tracksToRender.forEach((track, index) => {
+                    const trackElement = document.createElement('div');
+                    trackElement.className = 'track-item';
+                    trackElement.dataset.index = index;
+                    trackElement.innerHTML = `
+                        <div class="track-number">${index + 1}</div>
+                        <div class="track-info">
+                            <div class="track-title">${track.title}</div>
+                            <div class="track-artist">${track.artist}</div>
+                        </div>
+                        <div class="track-duration">${track.duration}</div>
+                    `;
+                    trackElement.addEventListener('click', () => playTrack(index));
+                    trackList.appendChild(trackElement);
+                });
+            }
+            
+            // 更新活动曲目显示
+            function updateActiveTrack() {
+                // 移除所有活动状态
+                document.querySelectorAll('.track-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // 设置当前曲目为活动状态
+                if (playerState.currentTrackIndex >= 0) {
+                    const activeTrack = document.querySelector(`.track-item[data-index="${playerState.currentTrackIndex}"]`);
+                    if (activeTrack) {
+                        activeTrack.classList.add('active');
+                    }
+                    
+                    // 更新播放器信息显示
+                    const track = playerState.filteredTracks[playerState.currentTrackIndex];
+                    document.getElementById('current-track').textContent = track.title;
+                    document.getElementById('current-artist').textContent = track.artist;
+                }
+            }
+            
+            // 播放指定曲目
+            function playTrack(index) {
+                playerState.currentTrackIndex = index;
+                playerState.isPlaying = true;
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                updateActiveTrack();
+                
+                // 模拟播放进度
+                simulateProgress();
+            }
+            
+            // 播放/暂停切换
+            function togglePlayPause() {
+                if (playerState.filteredTracks.length === 0) return;
+                
+                if (playerState.currentTrackIndex === -1) {
+                    // 如果没有选择曲目，播放第一首
+                    playTrack(0);
+                } else {
+                    // 切换播放状态
+                    playerState.isPlaying = !playerState.isPlaying;
+                    playPauseBtn.innerHTML = playerState.isPlaying ? 
+                        '<i class="fas fa-pause"></i>' : 
+                        '<i class="fas fa-play"></i>';
+                    
+                    if (playerState.isPlaying) {
+                        simulateProgress();
+                    }
+                }
+            }
+            
+            // 播放上一首
+            function playPrevious() {
+                if (playerState.filteredTracks.length === 0) return;
+                
+                if (playerState.currentTrackIndex > 0) {
+                    playTrack(playerState.currentTrackIndex - 1);
+                } else {
+                    playTrack(playerState.filteredTracks.length - 1);
+                }
+            }
+            
+            // 播放下一首
+            function playNext() {
+                if (playerState.filteredTracks.length === 0) return;
+                
+                if (playerState.currentTrackIndex < playerState.filteredTracks.length - 1) {
+                    playTrack(playerState.currentTrackIndex + 1);
+                } else {
+                    playTrack(0);
+                }
+            }
+            
+            // 模拟播放进度
+            function simulateProgress() {
+                if (!playerState.isPlaying) return;
+                
+                playerState.progress += 1;
+                if (playerState.progress > 100) {
+                    playerState.progress = 0;
+                    playNext();
+                    return;
+                }
+                
+                progressBar.style.width = playerState.progress + '%';
+                setTimeout(simulateProgress, 100);
+            }
+            
+            // 搜索音乐
+            function searchMusic() {
+                const searchTerm = musicSearch.value.toLowerCase();
+                const genre = genreFilter.value;
+                
+                playerState.filteredTracks = playerState.tracks.filter(track => {
+                    const matchesSearch = track.title.toLowerCase().includes(searchTerm) || 
+                                         track.artist.toLowerCase().includes(searchTerm);
+                    const matchesGenre = genre === '' || track.genre === genre;
+                    return matchesSearch && matchesGenre;
+                });
+                
+                renderTrackList(playerState.filteredTracks);
+                updateActiveTrack();
+            }
+            
+            // 播放全部
+            function playAll() {
+                if (playerState.filteredTracks.length > 0) {
+                    playTrack(0);
+                }
+            }
+            
+            // 事件监听器
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            prevBtn.addEventListener('click', playPrevious);
+            nextBtn.addEventListener('click', playNext);
+            volumeSlider.addEventListener('input', (e) => {
+                playerState.volume = e.target.value;
+            });
+            searchBtn.addEventListener('click', searchMusic);
+            musicSearch.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    searchMusic();
+                }
+            });
+            genreFilter.addEventListener('change', searchMusic);
+            playAllBtn.addEventListener('click', playAll);
+            
+            // 初始化显示
+            renderTrackList(playerState.tracks);
+        }
+        
+        // 任务管理功能
+        function setupTaskManager() {
+            const taskForm = document.getElementById('task-form');
+            const taskList = document.getElementById('task-list');
+            const addTaskBtn = document.getElementById('add-task-btn');
+            
+            if (addTaskBtn) {
+                addTaskBtn.addEventListener('click', function() {
+                    const title = document.getElementById('task-title').value;
+                    const description = document.getElementById('task-description').value;
+                    const dueDate = document.getElementById('task-due-date').value;
+                    
+                    if (!title) {
+                        utils.showNotification('请输入任务标题', 'warning');
+                        return;
+                    }
+                    
+                    // 创建新任务项
+                    const taskItem = document.createElement('div');
+                    taskItem.className = 'task-item';
+                    taskItem.innerHTML = `
+                        <input type="checkbox">
+                        <div>
+                            <div>${title}</div>
+                            <div style="font-size: 0.8rem; color: #64748b;">
+                                ${description ? description + ' · ' : ''}
+                                ${dueDate ? new Date(dueDate).toLocaleDateString('zh-CN') : '无截止日期'}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 添加到任务列表顶部
+                    if (taskList.firstChild) {
+                        taskList.insertBefore(taskItem, taskList.firstChild);
+                    } else {
+                        taskList.appendChild(taskItem);
+                    }
+                    
+                    // 清空表单
+                    document.getElementById('task-title').value = '';
+                    document.getElementById('task-description').value = '';
+                    document.getElementById('task-due-date').value = '';
+                    
+                    utils.showNotification('任务添加成功', 'success');
+                });
+            }
+            
+            // 为现有任务添加事件监听器
+            taskList.addEventListener('change', function(e) {
+                if (e.target.type === 'checkbox') {
+                    if (e.target.checked) {
+                        utils.showNotification('任务已完成', 'success');
+                    }
+                }
+            });
+        }
+        
+        // 聊天功能
+        function setupChat() {
+            const messageInput = document.getElementById('message-input');
+            const sendMessageBtn = document.getElementById('send-message-btn');
+            const messagesContainer = document.querySelector('.messages');
+            
+            if (sendMessageBtn && messageInput) {
+                // 发送消息功能
+                function sendMessage() {
+                    const message = messageInput.value.trim();
+                    if (!message) return;
+                    
+                    // 添加消息到聊天区域
+                    const messageBubble = document.createElement('div');
+                    messageBubble.className = 'message-bubble sent';
+                    messageBubble.textContent = message;
+                    messagesContainer.appendChild(messageBubble);
+                    
+                    // 清空输入框
+                    messageInput.value = '';
+                    
+                    // 滚动到底部
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // 模拟回复
+                    setTimeout(() => {
+                        const replyBubble = document.createElement('div');
+                        replyBubble.className = 'message-bubble received';
+                        replyBubble.textContent = '收到消息: ' + message;
+                        messagesContainer.appendChild(replyBubble);
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 1000);
+                }
+                
+                sendMessageBtn.addEventListener('click', sendMessage);
+                
+                messageInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
+        }
+        
+        // 页面加载完成后初始化所有功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化认证管理
+            if (typeof authManager !== 'undefined' && typeof authManager.init === 'function') {
+                authManager.init();
+            }
+            
+            // 为AI助手输入框添加回车事件监听
+            const aiInput = document.getElementById('ai-input');
+            const aiSendButton = document.getElementById('ai-send-btn');
+            if (aiInput && aiSendButton) {
+                aiInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendAiMessage();
+                    }
+                });
+                
+                aiSendButton.addEventListener('click', sendAiMessage);
+            }
+            
+            // 初始化设备控制
+            setupDeviceControls();
+            
+            // 初始化API权限管理
+            setupApiPermissionManager();
+            
+            // 初始化图表
+            initCharts();
+            
+            // 初始化音乐播放器
+            initMusicPlayer();
+            
+            // 初始化任务管理
+            setupTaskManager();
+            
+            // 初始化聊天功能
+            setupChat();
+        });
+    </script>
+</body>
+</html>

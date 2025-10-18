@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="智能设备管理后台">
+    <title>智能设备管理后台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 内联样式保留在HTML中 */
+        .restricted-content {
+            display: none;
+        }
+
+        .show {
+            display: block !important;
+        }
+
+        #user-profile {
+            display: none;
+        }
+
+        #login-modal.show {
+            display: block;
+        }
+        
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --text: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --background: #1a1a2e;
+            --card-bg: #16213e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            width: 100%;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d35400;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #2c3e50;
+            transform: translateY(-2px);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: var(--accent);
+        }
+
+        .tab.active {
+            background: var(--accent);
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .device-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .device-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .device-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .device-info h3 {
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .device-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            background: var(--success);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        .notification.warning {
+            background: var(--warning);
+        }
+
+        .login-required {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .login-required i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .login-required h3 {
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+
+        .status-inactive {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .bg-blue {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--accent);
+        }
+
+        .bg-green {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+
+        .bg-orange {
+            background: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+        }
+
+        .bg-red {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .user-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .user-role {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .user-status {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        #current-time {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .preference-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: center;
+            }
+            
+            .device-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-cogs"></i>
+                <h1>智能设备管理后台</h1>
+            </div>
+            <div class="search-box" style="max-width: 300px;">
+                <input type="text" id="global-search" placeholder="全局搜索...">
+                <button class="btn btn-primary" id="global-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div id="current-time"></div>
+            <!-- 用户信息区域 -->
+            <div id="user-info" style="display: flex; align-items: center; margin-left: 20px;">
+                <div id="login-info">
+                    <button class="btn btn-primary" id="login-btn">登录</button>
+                </div>
+                <div id="user-profile" style="display: none; align-items: center;">
+                    <span id="username" style="margin-right: 10px;"></span>
+                    <button class="btn btn-danger" id="logout-btn">登出</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 标签页导航 -->
+        <div class="tabs">
+            <div class="tab active" data-target="dashboard">仪表盘</div>
+            <div class="tab" data-target="api-config">API配置管理</div>
+            <div class="tab" data-target="user-profiles">用户画像</div>
+            <div class="tab" data-target="biometric">生物识别管理</div>
+            <div class="tab" data-target="user-preferences">用户偏好设置</div>
+            <div class="tab" data-target="user-management">用户管理</div>
+            <div class="tab" data-target="system-management">系统管理</div>
+            <div class="tab" data-target="device-management">设备管理</div>
+            <div class="tab" data-target="device-registration">设备注册管理</div>
+            <div class="tab" data-target="media-processing">媒体处理</div>
+            <div class="tab" data-target="ai-services">AI服务</div>
+            <div class="tab" data-target="workflow">工作流</div>
+            <div class="tab" data-target="billing">计费统计</div>
+            <div class="tab" data-target="system-settings">系统设置</div>
+        </div>
+
+        <!-- 仪表盘内容 -->
+        <div class="content active" id="dashboard">
+            <div class="card">
+                <h2>欢迎使用智能设备管理后台</h2>
+                <div id="welcome-content">
+                    <p>请登录以访问所有功能。</p>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="user-count">0</h3>
+                        <p>用户总数</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-green">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="device-count">0</h3>
+                        <p>设备总数</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="task-count">0</h3>
+                        <p>任务总数</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-red">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="chat-messages">0</h3>
+                        <p>聊天消息数</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>用户行为分析</h2>
+                <div class="chart-container">
+                    <canvas id="behaviorChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>系统活动</h2>
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户管理 -->
+        <div class="content" id="user-management">
+            <div class="restricted-content" id="user-management-restricted">
+                <div class="login-required">
+                    <i class="fas fa-lock"></i>
+                    <h3>访问受限</h3>
+                    <p>此功能需要登录才能访问</p>
+                    <button class="btn btn-primary user-management-login-btn">立即登录</button>
+                </div>
+            </div>
+            <div class="restricted-content" id="user-management-content">
+                <div class="card">
+                    <h2>用户管理</h2>
+                    <div class="search-box">
+                        <input type="text" id="user-search" placeholder="搜索用户...">
+                        <button class="btn btn-primary" id="user-search-btn">搜索</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user-sort">排序方式</label>
+                        <select id="user-sort">
+                            <option value="name">按姓名</option>
+                            <option value="registrationDate">按注册时间</option>
+                            <option value="lastActive">按最后活跃时间</option>
+                        </select>
+                    </div>
+                    
+                    <div class="device-list" id="user-list">
+                        <!-- 用户列表将通过JavaScript动态加载 -->
+                    </div>
+                    
+                    <div class="card">
+                        <h2>管理员列表</h2>
+                        <div class="device-list" id="admin-list">
+                            <!-- 管理员列表将通过JavaScript动态加载 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 登录模态框 -->
+        <div id="login-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>管理员登录</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">用户名</label>
+                        <input type="text" id="login-username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" id="login-submit-btn">
+                            <span id="login-submit-text">登录</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <p>还没有账户？<button class="btn btn-secondary" id="show-register-btn">立即注册</button></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 注册模态框 -->
+        <div id="register-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>管理员注册</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-username">用户名</label>
+                        <input type="text" id="register-username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">确认密码</label>
+                        <input type="password" id="register-confirm-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" id="register-submit-btn">
+                            <span id="register-submit-text">注册</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <p>已有账户？<button class="btn btn-secondary" id="show-login-btn">立即登录</button></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知区域 -->
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <script>
+        // 工具函数
+        const utils = {
+            // 显示通知
+            showNotification: function(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = 'notification show ' + type;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            },
+            
+            // 设置按钮加载状态
+            setButtonLoading: function(button, textElement, loaderElement, isLoading) {
+                if (isLoading) {
+                    button.disabled = true;
+                    if (textElement) textElement.style.display = 'none';
+                    if (loaderElement) loaderElement.style.display = 'inline-block';
+                } else {
+                    button.disabled = false;
+                    if (textElement) textElement.style.display = 'inline-block';
+                    if (loaderElement) loaderElement.style.display = 'none';
+                }
+            }
+        };
+
+        // 认证服务
+        const authService = {
+            // API端点
+            apiEndpoints: {
+                login: '/api/token',
+                register: '/register',
+                users: '/api/users',
+                admins: '/api/admins',
+                roles: '/api/roles',
+                permissions: '/api/permissions'
+            },
+            
+            // 登录
+            login: async function(credentials) {
+                try {
+                    const response = await fetch(this.apiEndpoints.login, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `username=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || '登录失败');
+                    }
+                    
+                    const data = await response.json();
+                    return {
+                        success: true,
+                        token: data.access_token,
+                        tokenType: data.token_type
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                }
+            },
+            
+            // 注册
+            register: async function(userData) {
+                try {
+                    const response = await fetch(this.apiEndpoints.register, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || errorData.error || '注册失败');
+                    }
+                    
+                    const data = await response.json();
+                    return {
+                        success: true,
+                        message: data.message,
+                        userId: data.user_id
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                }
+            },
+            
+            // 登出
+            logout: function() {
+                // 清除 sessionStorage
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('username');
+                sessionStorage.removeItem('adminRole');
+                
+                // 清除 localStorage 中的认证信息（但保留记住我选项）
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+                localStorage.removeItem('adminRole');
+            },
+            
+            // 获取当前用户角色
+            getCurrentUserRole: function() {
+                return sessionStorage.getItem('adminRole') || localStorage.getItem('adminRole') || 'viewer';
+            },
+            
+            // 检查是否记住登录状态
+            isRememberMe: function() {
+                return localStorage.getItem('rememberMe') === 'true';
+            },
+            
+            // 获取当前用户名
+            getCurrentUsername: function() {
+                return sessionStorage.getItem('username') || localStorage.getItem('username') || '';
+            }
+        };
+
+        // 权限管理模块
+        const permissionManager = {
+            // 定义角色权限
+            roles: {
+                'user': ['read'],
+                'admin': ['read', 'write'],
+                'superadmin': ['read', 'write', 'delete', 'manage_admins']
+            },
+            
+            // 检查用户是否有特定权限
+            hasPermission: function(permission) {
+                const role = authService.getCurrentUserRole();
+                const permissions = this.roles[role] || [];
+                return permissions.includes(permission);
+            },
+            
+            // 检查用户是否有特定角色或更高权限
+            hasRole: function(requiredRole) {
+                const currentRole = authService.getCurrentUserRole();
+                const roleHierarchy = {
+                    'user': 1,
+                    'admin': 2,
+                    'superadmin': 3
+                };
+                
+                return (roleHierarchy[currentRole] || 0) >= (roleHierarchy[requiredRole] || 0);
+            },
+            
+            // 显示或隐藏受限内容
+            updateContentVisibility: function() {
+                const isAuthenticated = authService.getCurrentUsername() !== '';
+                const userRole = authService.getCurrentUserRole();
+                
+                // 根据登录状态显示/隐藏受限内容
+                document.querySelectorAll('.restricted-content').forEach(element => {
+                    if (element.id.endsWith('-restricted')) {
+                        element.style.display = isAuthenticated ? 'none' : 'block';
+                    } else if (element.id.endsWith('-content')) {
+                        element.style.display = isAuthenticated ? 'block' : 'none';
+                    }
+                });
+                
+                // 根据权限显示/隐藏特定操作
+                document.querySelectorAll('[data-required-permission]').forEach(element => {
+                    const requiredPermission = element.getAttribute('data-required-permission');
+                    element.style.display = this.hasPermission(requiredPermission) ? '' : 'none';
+                });
+                
+                // 特殊处理仪表盘欢迎内容
+                const dashboardContent = document.getElementById('dashboard');
+                if (dashboardContent) {
+                    const welcomeContent = dashboardContent.querySelector('#welcome-content');
+                    if (welcomeContent) {
+                        if (isAuthenticated) {
+                            const username = authService.getCurrentUsername();
+                            const roleDisplayNames = {
+                                'superadmin': '超级管理员',
+                                'admin': '管理员',
+                                'user': '用户'
+                            };
+                            const roleDisplayName = roleDisplayNames[userRole] || userRole;
+                            welcomeContent.innerHTML = `
+                                <p>欢迎回来，<strong>${username}</strong>！</p>
+                                <p>您已成功登录系统，当前角色：<strong>${roleDisplayName}</strong>，可以访问相应权限的功能。</p>
+                            `;
+                        } else {
+                            welcomeContent.innerHTML = '<p>请登录以访问所有功能。</p>';
+                        }
+                    }
+                }
+            }
+        };
+
+        // 用户管理模块
+        const userManager = {
+            currentPage: 1,
+            pageSize: 10,
+            totalUsers: 0,
+            
+            // 初始化用户管理模块
+            init: function() {
+                // 确保DOM元素存在再绑定事件
+                const userSearchBtn = document.getElementById('user-search-btn');
+                if (userSearchBtn) {
+                    userSearchBtn.addEventListener('click', () => {
+                        this.loadUsers();
+                    });
+                }
+                
+                // 绑定排序选择事件
+                const userSort = document.getElementById('user-sort');
+                if (userSort) {
+                    userSort.addEventListener('change', () => {
+                        this.loadUsers();
+                    });
+                }
+                
+                // 加载用户和管理员列表
+                this.loadUsers();
+                this.loadAdmins();
+            },
+            
+            // 加载用户列表
+            loadUsers: async function() {
+                try {
+                    // 获取认证token
+                    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+                    if (!token) {
+                        throw new Error('未登录');
+                    }
+                    
+                    // 获取搜索和排序参数
+                    const searchInput = document.getElementById('user-search');
+                    const sortSelect = document.getElementById('user-sort');
+                    const search = searchInput ? searchInput.value : '';
+                    const sort = sortSelect ? sortSelect.value : 'name';
+                    
+                    // 构造请求URL
+                    let url = this.apiEndpoints.users;
+                    const params = new URLSearchParams();
+                    if (search) params.append('search', search);
+                    if (sort) params.append('sort', sort);
+                    if (params.toString()) url += '?' + params.toString();
+                    
+                    // 发送请求
+                    const response = await fetch(url, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            throw new Error('未授权访问，请重新登录');
+                        }
+                        if (response.status === 403) {
+                            throw new Error('权限不足，需要管理员权限');
+                        }
+                        throw new Error('获取用户列表失败');
+                    }
+                    
+                    const result = await response.json();
+                    const users = result.users || [];
+                    this.totalUsers = result.total || 0;
+                    this.currentPage = page;
+                    
+                    // 显示用户列表
+                    this.displayUsers(users);
+                } catch (error) {
+                    console.error('Load users error:', error);
+                    const userListContainer = document.getElementById('user-list');
+                    userListContainer.innerHTML = `
+                        <div class="error-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>加载用户列表失败: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            },
+            
+            // 显示用户列表
+            displayUsers: function(users) {
+                const container = document.getElementById('user-list');
+                
+                if (!users || users.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <p>暂无用户信息</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                users.forEach(user => {
+                    html += `
+                        <div class="device-item" data-user-id="${user.id}">
+                            <div class="device-info">
+                                <h3>${user.username}</h3>
+                                <p>邮箱: ${user.email}</p>
+                                <p>角色: ${user.role}</p>
+                                <p>状态: 
+                                    <span class="status-badge ${user.is_active ? 'status-active' : 'status-inactive'}">
+                                        ${user.is_active ? '活跃' : '禁用'}
+                                    </span>
+                                </p>
+                                <p>注册时间: ${new Date(user.created_at).toLocaleString()}</p>
+                            </div>
+                            <div class="device-actions">
+                                <button class="btn btn-sm btn-primary edit-user-btn" data-user-id="${user.id}">
+                                    <i class="fas fa-edit"></i> 编辑
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-user-btn" data-user-id="${user.id}">
+                                    <i class="fas fa-trash"></i> 删除
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            },
+            
+            // 加载管理员列表
+            loadAdmins: async function() {
+                try {
+                    // 获取认证token
+                    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+                    if (!token) {
+                        throw new Error('未登录');
+                    }
+                    
+                    // 发送请求
+                    const response = await fetch(this.apiEndpoints.admins, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            throw new Error('未授权访问，请重新登录');
+                        }
+                        if (response.status === 403) {
+                            throw new Error('权限不足，需要管理员权限');
+                        }
+                        throw new Error('获取管理员列表失败');
+                    }
+                    
+                    const admins = await response.json();
+                    
+                    // 显示管理员列表
+                    this.displayAdmins(admins);
+                } catch (error) {
+                    console.error('Load admins error:', error);
+                    const adminListContainer = document.getElementById('admin-list');
+                    adminListContainer.innerHTML = `
+                        <div class="error-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>加载管理员列表失败: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            },
+            
+            // 显示管理员列表
+            displayAdmins: function(admins) {
+                const container = document.getElementById('admin-list');
+                
+                if (!admins || admins.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-user-shield"></i>
+                            <p>暂无管理员信息</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                admins.forEach(admin => {
+                    html += `
+                        <div class="device-item" data-admin-id="${admin.id}">
+                            <div class="device-info">
+                                <h3>${admin.username}</h3>
+                                <p>角色: ${admin.role}</p>
+                                <p>创建时间: ${new Date(admin.created_at).toLocaleString()}</p>
+                                <p>状态: 
+                                    ${admin.username === 'admin' 
+                                        ? '<span class="status-badge status-active">系统账户</span>'
+                                        : '<span class="status-badge status-inactive">只读</span>'
+                                    }
+                                </p>
+                            </div>
+                            <div class="device-actions">
+                                <button class="btn btn-sm btn-warning edit-admin-btn" data-admin-id="${admin.id}">
+                                    <i class="fas fa-edit"></i> 编辑
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-admin-btn" data-admin-id="${admin.id}" ${admin.username === 'admin' ? 'disabled' : ''}>
+                                    <i class="fas fa-trash"></i> 删除
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html || `
+                    <div class="empty-state">
+                        <i class="fas fa-user-shield"></i>
+                        <p>暂无管理员信息</p>
+                    </div>
+                `;
+            }
+        };
+
+        // 登录表单提交处理
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const usernameInput = document.getElementById('login-username');
+            const passwordInput = document.getElementById('login-password');
+            
+            if (!usernameInput || !passwordInput) {
+                utils.showNotification('登录表单元素缺失', 'error');
+                return;
+            }
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!username || !password) {
+                utils.showNotification('请输入用户名和密码', 'warning');
+                return;
+            }
+            
+            const loginSubmitBtn = document.getElementById('login-submit-btn');
+            const loginSubmitText = document.getElementById('login-submit-text');
+            const loginSubmitLoader = document.getElementById('login-submit-loader');
+            
+            // 设置按钮为加载状态
+            if (loginSubmitBtn && loginSubmitText && loginSubmitLoader) {
+                utils.setButtonLoading(loginSubmitBtn, loginSubmitText, loginSubmitLoader, true);
+            }
+            
+            try {
+                const result = await authService.login({ username, password });
+                
+                if (result.success) {
+                    utils.showNotification('登录成功', 'success');
+                    
+                    // 保存认证信息到sessionStorage
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('token', result.token);
+                    sessionStorage.setItem('username', username);
+                    sessionStorage.setItem('adminRole', 'admin'); // 默认为管理员角色
+                    
+                    // 更新UI状态
+                    document.getElementById('login-info').style.display = 'none';
+                    document.getElementById('user-profile').style.display = 'flex';
+                    document.getElementById('username').textContent = username;
+                    
+                    // 隐藏登录模态框
+                    document.getElementById('login-modal').classList.remove('show');
+                    
+                    // 更新内容可见性（包括权限相关）
+                    permissionManager.updateContentVisibility();
+                } else {
+                    // 登录失败，显示错误信息
+                    utils.showNotification(result.error || '登录失败', 'error');
+                }
+            } catch (error) {
+                utils.showNotification('登录失败: ' + error.message, 'error');
+            } finally {
+                if (loginSubmitBtn && loginSubmitText && loginSubmitLoader) {
+                    utils.setButtonLoading(loginSubmitBtn, loginSubmitText, loginSubmitLoader, false);
+                }
+            }
+        }
+
+        // 注册表单提交处理
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const usernameInput = document.getElementById('register-username');
+            const passwordInput = document.getElementById('register-password');
+            const confirmPasswordInput = document.getElementById('register-confirm-password');
+            
+            if (!usernameInput || !passwordInput || !confirmPasswordInput) {
+                utils.showNotification('注册表单元素缺失', 'error');
+                return;
+            }
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            const confirmPassword = confirmPasswordInput.value.trim();
+            
+            if (!username || !password || !confirmPassword) {
+                utils.showNotification('请填写所有必填字段', 'warning');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                utils.showNotification('密码不匹配', 'error');
+                return;
+            }
+            
+            const registerSubmitBtn = document.getElementById('register-submit-btn');
+            const registerSubmitText = document.getElementById('register-submit-text');
+            const registerSubmitLoader = document.getElementById('register-submit-loader');
+            
+            // 设置按钮为加载状态
+            if (registerSubmitBtn && registerSubmitText && registerSubmitLoader) {
+                utils.setButtonLoading(registerSubmitBtn, registerSubmitText, registerSubmitLoader, true);
+            }
+            
+            try {
+                const result = await authService.register({ 
+                    username, 
+                    password,
+                    email: `${username}@allsmart.com` // 临时邮箱
+                });
+                
+                if (result.success) {
+                    utils.showNotification('注册成功！', 'success');
+                    
+                    // 隐藏注册模态框
+                    document.getElementById('register-modal').classList.remove('show');
+                    
+                    // 显示登录模态框
+                    document.getElementById('login-modal').classList.add('show');
+                } else {
+                    // 注册失败，显示错误信息
+                    utils.showNotification(result.error || '注册失败', 'error');
+                }
+            } catch (error) {
+                utils.showNotification('注册失败: ' + error.message, 'error');
+            } finally {
+                if (registerSubmitBtn && registerSubmitText && registerSubmitLoader) {
+                    utils.setButtonLoading(registerSubmitBtn, registerSubmitText, registerSubmitLoader, false);
+                }
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定标签页切换事件
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有活动状态
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                    
+                    // 添加当前活动状态
+                    this.classList.add('active');
+                    const target = this.getAttribute('data-target');
+                    document.getElementById(target).classList.add('active');
+                });
+            });
+            
+            // 绑定登录按钮事件
+            document.getElementById('login-btn').addEventListener('click', function() {
+                document.getElementById('login-modal').classList.add('show');
+            });
+            
+            // 绑定登录模态框关闭事件
+            document.querySelectorAll('#login-modal .close, #login-modal .modal-header').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('close') || e.target.classList.contains('modal-header')) {
+                        document.getElementById('login-modal').classList.remove('show');
+                    }
+                });
+            });
+            
+            // 绑定注册按钮事件
+            document.getElementById('show-register-btn').addEventListener('click', function() {
+                document.getElementById('login-modal').classList.remove('show');
+                document.getElementById('register-modal').classList.add('show');
+            });
+            
+            // 绑定显示登录按钮事件
+            document.getElementById('show-login-btn').addEventListener('click', function() {
+                document.getElementById('register-modal').classList.remove('show');
+                document.getElementById('login-modal').classList.add('show');
+            });
+            
+            // 绑定注册模态框关闭事件
+            document.querySelectorAll('#register-modal .close, #register-modal .modal-header').forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('close') || e.target.classList.contains('modal-header')) {
+                        document.getElementById('register-modal').classList.remove('show');
+                    }
+                });
+            });
+            
+            // 绑定登录表单提交事件
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            // 绑定注册表单提交事件
+            const registerForm = document.getElementById('register-form');
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleRegister);
+            }
+            
+            // 绑定登出事件
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                authService.logout();
+                utils.showNotification('已成功登出', 'success');
+                
+                // 隐藏受限内容
+                document.querySelectorAll('.restricted-content').forEach(el => {
+                    if (el.id.endsWith('-restricted')) {
+                        el.style.display = 'block';
+                    } else if (el.id.endsWith('-content')) {
+                        el.style.display = 'none';
+                    }
+                });
+                
+                // 显示登录按钮
+                document.getElementById('login-info').style.display = 'block';
+                document.getElementById('user-profile').style.display = 'none';
+                
+                // 更新仪表盘欢迎内容
+                const welcomeContent = document.querySelector('#dashboard #welcome-content');
+                if (welcomeContent) {
+                    welcomeContent.innerHTML = '<p>请登录以访问所有功能。</p>';
+                }
+            });
+            
+            // 检查是否已登录
+            if (authService.getCurrentUsername()) {
+                // 显示用户信息
+                document.getElementById('login-info').style.display = 'none';
+                document.getElementById('user-profile').style.display = 'flex';
+                document.getElementById('username').textContent = authService.getCurrentUsername();
+                
+                // 更新内容可见性
+                permissionManager.updateContentVisibility();
+            }
+            
+            // 初始化用户管理模块
+            userManager.init();
+        });
+    </script>
+</body>
+</html>
