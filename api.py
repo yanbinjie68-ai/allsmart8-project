@@ -63,8 +63,6 @@ def create_api_config_endpoint(api_config: ApiConfigCreate, db: Session = Depend
 def read_api_configs(skip: int = 0, limit: int = 100, search: str = None, db: Session = Depends(get_db)):
     return get_api_configs(db, skip=skip, limit=limit, search=search)
 
-
-# ... existing code ...
 @router.put("/api-configs/{config_id}", response_model=ApiConfig)
 def update_api_config_endpoint(config_id: int, api_config: ApiConfigUpdate, db: Session = Depends(get_db)):
     # 获取现有配置
